@@ -1573,9 +1573,10 @@ a.setAttribute('href', 'https://example.com/'); // change the content attribute 
   initially empty.</p>
 
   <p>To <dfn data-x="enqueue the following steps" data-lt="enqueue steps|enqueue the following
-  steps" export for="parallel queue">enqueue steps</dfn> to a <span>parallel queue</span>,
-  <span>enqueue</span> the algorithm steps to the <span>parallel queue</span>'s <span>algorithm
-  queue</span>.</p>
+  steps" export for="parallel queue">enqueue steps</dfn> <var>algorithm</var> to a
+  <span>parallel queue</span> <var>queue</var> given an AsyncContext <var>asyncContext</var>,
+  <span>enqueue</span> the pair (<var>algorithm</var>, <var>asyncContext</var>) to
+  <var>queue</var>'s <span>algorithm queue</span>.</p>
 
   <p>To <dfn data-x="starting a new parallel queue" data-lt="start a new parallel queue|starting a
   new parallel queue" export>start a new parallel queue</dfn>, run the following steps:</p>
@@ -1591,10 +1592,22 @@ a.setAttribute('href', 'https://example.com/'); // change the content attribute 
       <p>While true:</p>
 
       <ol>
-       <li><p>Let <var>steps</var> be the result of <span data-x="dequeue">dequeueing</span> from
-       <var>parallelQueue</var>'s <span>algorithm queue</span>.</p></li>
+       <li><p>Let (<var>steps</var>, <var>asyncContext</var>) be the result of
+       <span data-x="dequeue">dequeueing</span> from <var>parallelQueue</var>'s
+       <span>algorithm queue</span>.</p></li>
 
-       <li><p>If <var>steps</var> is not nothing, then run <var>steps</var>.</p></li>
+       <li>
+        <p>If <var>steps</var> is not nothing:</p>
+
+        <ol>
+         <li><p>Let <var>oldAsyncContext</var> be
+         AsyncContextSwap(<var>asyncContext</var>).</p></li>
+
+         <li><p>Run <var>steps</var>.</p></li>
+
+         <li><p>Perform AsyncContextSwap(<var>oldAsyncContext</var>).</p></li>
+        </ol>
+       </li>
 
        <li><p><span>Assert</span>: running <var>steps</var> did not throw an exception, as steps
        running <span>in parallel</span> are not allowed to throw.</p></li>
@@ -65730,6 +65743,8 @@ callback <dfn callback>BlobCallback</dfn> = undefined (<span>Blob</span>? blob);
    dimension nor its vertical dimension is zero), then set <var>result</var> to a copy of this
    <code>canvas</code> element's bitmap.
 
+   <li><p>Let <var>asyncContext</var> be AsyncContextSnapshot().</p></li>
+
    <li>
     <p>Run these steps <span>in parallel</span>:</p>
 
@@ -65741,7 +65756,8 @@ callback <dfn callback>BlobCallback</dfn> = undefined (<span>Blob</span>? blob);
      <li>
       <p><span>Queue an element task</span> on the
       <!--en-GB--><dfn id="canvas-blob-serialisation-task-source">canvas blob serialization task
-      source</dfn> given the <code>canvas</code> element to run these steps:</p>
+      source</dfn> given the <code>canvas</code> element and <var>asyncContext</var> to run these
+      steps:</p>
 
       <ol>
        <li><p>If <var>result</var> is non-null, then set <var>result</var> to a new
@@ -112971,6 +112987,9 @@ import "https://example.com/foo/../module2.mjs";</code></pre>
    <dt>A <dfn export>script evaluation environment settings object set</dfn></dt>
    <dd>A <span>set</span> of <span data-x="environment settings object">environment settings
    objects</span> used for tracking script evaluation during the task.</dd>
+
+   <dt>An <dfn data-x="concept-task-async-context">async context</dfn></dt>
+   <dd>An AsyncContext.</dd>
   </dl>
 
   <p>A <span data-x="concept-task">task</span> is <dfn data-x="concept-task-runnable">runnable</dfn>
@@ -113025,8 +113044,8 @@ import "https://example.com/foo/../module2.mjs";</code></pre>
   <h5>Queuing tasks</h5>
 
   <p>To <dfn export>queue a task</dfn> on a <span>task source</span> <var>source</var>, which
-  performs a series of steps <var>steps</var>, optionally given an event loop <var>event loop</var>
-  and a document <var>document</var>:</p>
+  performs a series of steps <var>steps</var>, given an AsyncContext <var>asyncContext</var> and
+  optionally given an event loop <var>event loop</var> and a document <var>document</var>:</p>
 
   <ol>
    <li><p>If <var>event loop</var> was not given, set <var>event loop</var> to the <span>implied
@@ -113049,6 +113068,9 @@ import "https://example.com/foo/../module2.mjs";</code></pre>
    <li><p>Set <var>task</var>'s <span>script evaluation environment settings object set</span> to an
    empty <span>set</span>.</p></li>
 
+   <li><p>Set <var>task</var>'s <span data-x="concept-task-async-context">async context</span> to
+   <var>asyncContext</var>.</p></li>
+
    <li><p>Let <var>queue</var> be the <span>task queue</span> to which <var>source</var> is
    associated on <var>event loop</var>.</p></li>
 
@@ -113062,7 +113084,9 @@ import "https://example.com/foo/../module2.mjs";</code></pre>
   instead. Using the wrapper algorithms is recommended.</p>
 
   <p>To <dfn export>queue a global task</dfn> on a <span>task source</span> <var>source</var>, with
-  a <span>global object</span> <var>global</var> and a series of steps <var>steps</var>:</p>
+  a <span>global object</span> <var>global</var>,
+  an AsyncContext <var>asyncContext</var>,
+  and a series of steps <var>steps</var>:</p>
 
   <ol>
    <li><p>Let <var>event loop</var> be <var>global</var>'s <span>relevant agent</span>'s <span
@@ -113072,19 +113096,21 @@ import "https://example.com/foo/../module2.mjs";</code></pre>
    data-x="concept-document-window">associated <code>Document</code></span>, if <var>global</var> is
    a <code>Window</code> object; otherwise null.</p>
 
-   <li><p><span>Queue a task</span> given <var>source</var>, <var>event loop</var>,
-   <var>document</var>, and <var>steps</var>.</p></li>
+   <li><p><span>Queue a task</span> given <var>source</var>, <var>asyncContext</var>,
+   <var>event loop</var>, <var>document</var>, and <var>steps</var>.</p></li>
   </ol>
 
   <p>To <dfn export>queue an element task</dfn> on a <span>task source</span> <var>source</var>,
-  with an element <var>element</var> and a series of steps <var>steps</var>:</p>
+  with an element <var>element</var>,
+  an AsyncContext <var>asyncContext</var>,
+  and a series of steps <var>steps</var>:</p>
 
   <ol>
    <li><p>Let <var>global</var> be <var>element</var>'s <span>relevant global
    object</span>.</p></li>
 
-   <li><p><span>Queue a global task</span> given <var>source</var>, <var>global</var>, and
-   <var>steps</var>.</p></li>
+   <li><p><span>Queue a global task</span> given <var>source</var>, <var>global</var>,
+   <var>asyncContext</var>, and <var>steps</var>.</p></li>
   </ol>
 
   <p>To <dfn export>queue a microtask</dfn> which performs a series of steps <var>steps</var>,
@@ -113206,7 +113232,12 @@ import "https://example.com/foo/../module2.mjs";</code></pre>
      <li><p>Set the <span>event loop</span>'s <span>currently running task</span> to
      <var>oldestTask</var>.</p></li>
 
+     <li><p>Let <var>oldAsyncContext</var> be AsyncContextSwap(<var>oldestTask</var>'s
+     <span data-x="concept-task-async-context">async context</span>).</p></li>
+
      <li><p>Perform <var>oldestTask</var>'s <span data-x="concept-task-steps">steps</span>.</p></li>
+
+     <li><p>Perform AsyncContextSwap(<var>oldAsyncContext</var>).</p></li>
 
      <li><p>Set the <span>event loop</span>'s <span>currently running task</span> back to
      null.</p></li>
