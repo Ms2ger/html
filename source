@@ -101233,12 +101233,14 @@ location.href = '#foo';</code></pre>
    <li><p>Let <var>navigationId</var> be the result of <span>generating a random UUID</span>.
    <ref>WEBCRYPTO</ref></p></li>
 
+   <li><p>Let <var>asyncContext</var> be AsyncContextSnapshot().</p></li>
+
    <li>
     <p>If the <span>surrounding agent</span> is equal to <var>navigable</var>'s <span
     data-x="nav-document">active document</span>'s <span>relevant agent</span>, then continue these
     steps. Otherwise, <span>queue a global task</span> on the <span>navigation and traversal task
-    source</span> given <var>navigable</var>'s <span data-x="nav-window">active window</span> to
-    continue these steps.</p>
+    source</span> given <var>navigable</var>'s <span data-x="nav-window">active window</span> and
+    <var>asyncContext</var> to continue these steps.</p>
 
     <div class="note">
      <p>We do this because we are about to look at a lot of properties of <var>navigable</var>'s
