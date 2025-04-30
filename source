@@ -105313,11 +105313,14 @@ location.href = '#foo';</code></pre>
 
        <li><p><span>Restore persisted state</span> given <var>entry</var>.</p></li>
 
+       <li><p>Let <var>asyncContext</var> be AsyncContextSnapshot().</p></li>
+
        <li><p>If <var>oldURL</var>'s <span data-x="concept-url-fragment">fragment</span> is not
        equal to <var>entry</var>'s <span data-x="she-url">URL</span>'s <span
        data-x="concept-url-fragment">fragment</span>, then <span>queue a global task</span> on the
        <span>DOM manipulation task source</span> given <var>document</var>'s <span>relevant global
-       object</span> to <span data-x="concept-event-fire">fire an event</span> named <code
+       object</span> and <var>asyncContext</var> to
+       <span data-x="concept-event-fire">fire an event</span> named <code
        data-x="event-hashchange">hashchange</code> at <var>document</var>'s <span>relevant global
        object</span>, using <code>HashChangeEvent</code>, with the <code
        data-x="dom-HashChangeEvent-oldURL">oldURL</code> attribute initialized to the <span
