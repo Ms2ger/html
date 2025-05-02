@@ -35977,9 +35977,10 @@ interface <dfn interface>HTMLMediaElement</dfn> : <span>HTMLElement</span> {
   <p>Each <span>media element</span> has a unique <dfn>media element event task source</dfn>.</p>
 
   <p>To <dfn export>queue a media element task</dfn> with a <span>media element</span>
-  <var>element</var> and a series of steps <var>steps</var>, <span>queue an element task</span> on
+  <var>element</var>, and Async Context <var>asyncContext</var> and a series of steps
+  <var>steps</var>, <span>queue an element task</span> on
   the <span>media element</span>'s <span>media element event task source</span> given
-  <var>element</var> and <var>steps</var>.</p>
+  <var>element</var>, <var>asyncContext</var>, and <var>steps</var>.</p>
 
   </div>
 
@@ -36487,11 +36488,21 @@ interface <dfn interface>MediaError</dfn> {
    <li><p>Set the <span>media element</span>'s <span>delaying-the-load-event flag</span> to true
    (this <span data-x="delay the load event">delays the load event</span>).</p></li>
 
-   <li><p><span>Await a stable state</span>, allowing the <span
+   <li><p>Let <var>asyncContext</var> be AsyncContextSnapshot().</p></li>
+
+   <li><p><span>Await a stable state</span> given <var>asyncContext</var>, allowing the <span
    data-x="concept-task">task</span> that invoked this algorithm to continue. The <span>synchronous
    section</span> consists of all the remaining steps of this algorithm until the algorithm says the
    <span>synchronous section</span> has ended. (Steps in <span data-x="synchronous
    section">synchronous sections</span> are marked with &#x231B;.)</p></li>
+
+   <li>
+    <p>&#x231B; Let <var>asyncContext</var> be AsyncContextSnapshot().</p>
+
+    <p class="note">This is the same one as in the previous step, but we obtain it again from
+    the environment to clarify we're not relying on capturing the outer variable into the
+    <span>synchronous section</span>.</p>
+   </li>
 
    <li>
     <p>&#x231B; If the <span>media element</span>'s <span>blocked-on-parser</span> flag is false,
@@ -36533,8 +36544,8 @@ interface <dfn interface>MediaError</dfn> {
    data-x="dom-media-networkState">networkState</code> to <code
    data-x="dom-media-NETWORK_LOADING">NETWORK_LOADING</code>.</p></li>
 
-   <li><p>&#x231B; <span>Queue a media element task</span> given the <span>media element</span> to
-   <span data-x="concept-event-fire">fire an event</span> named <code
+   <li><p>&#x231B; <span>Queue a media element task</span> given the <span>media element</span> and
+   <var>asyncContext</var> to <span data-x="concept-event-fire">fire an event</span> named <code
    data-x="event-media-loadstart">loadstart</code> at the <span>media element</span>.</p></li>
 
    <li>
@@ -36553,13 +36564,13 @@ interface <dfn interface>MediaError</dfn> {
        <span>in parallel</span>.</p></li>
 
        <li><p>Run the <span data-x="concept-media-load-resource">resource fetch algorithm</span>
-       with the <span>assigned media provider object</span>. If that algorithm returns without
-       aborting <em>this</em> one, then the load failed.</p></li>
+       with the <span>assigned media provider object</span> and <var>asyncContext</var>.
+       If that algorithm returns without aborting <em>this</em> one, then the load failed.</p></li>
 
        <li><p><i>Failed with media provider</i>: Reaching this step indicates that the media
        resource failed to load. <span>Take pending play promises</span> and <span>queue a media
-       element task</span> given the <span>media element</span> to run the <span>dedicated media
-       source failure steps</span> with the result.</p></li>
+       element task</span> given the <span>media element</span> and <var>asyncContext</var> to run
+       the <span>dedicated media source failure steps</span> with the result.</p></li>
 
        <li><p>Wait for the <span data-x="concept-task">task</span> queued by the previous step to have
        executed.</p></li>
@@ -36593,14 +36604,14 @@ interface <dfn interface>MediaError</dfn> {
 
        <li><p>If <var>urlRecord</var> is not failure, then run the <span
        data-x="concept-media-load-resource">resource fetch algorithm</span> with
-       <var>urlRecord</var>. If that algorithm returns without aborting <em>this</em> one, then the
-       load failed.</p></li>
+       <var>urlRecord</var> and <var>asyncContext</var>.
+       If that algorithm returns without aborting <em>this</em> one, then the load failed.</p></li>
 
        <li><p><i>Failed with attribute</i>: Reaching this step indicates that the media resource
        failed to load or that <var>urlRecord</var> is failure. <span>Take pending play
        promises</span> and <span>queue a media element task</span> given the <span>media
-       element</span> to run the <span>dedicated media source failure steps</span> with the
-       result.</p></li>
+       element</span> and <var>asyncContext</var> to run the
+       <span>dedicated media source failure steps</span> with the result.</p></li>
 
        <li><p>Wait for the <span data-x="concept-task">task</span> queued by the previous step to have
        executed.</p></li>
@@ -36685,17 +36696,27 @@ interface <dfn interface>MediaError</dfn> {
        <span>in parallel</span>.</p></li>
 
        <li><p>Run the <span data-x="concept-media-load-resource">resource fetch algorithm</span>
-       with <var>urlRecord</var>. If that algorithm returns without aborting <em>this</em> one,
-       then the load failed.</p></li>
+       with <var>urlRecord</var> and <var>asyncContext</var>.
+       If that algorithm returns without aborting <em>this</em> one, then the load failed.</p></li>
 
        <li><p><i>Failed with elements</i>: <span>Queue a media element task</span> given the
-       <span>media element</span> to <span data-x="concept-event-fire">fire an event</span> named
+       <span>media element</span> and <var>asyncContext</var> to
+       <span data-x="concept-event-fire">fire an event</span> named
        <code data-x="event-source-error">error</code> at <var>candidate</var>.</p></li>
 
-       <li><p><span>Await a stable state</span>. The <span>synchronous section</span>
-       consists of all the remaining steps of this algorithm until the algorithm says the
-       <span>synchronous section</span> has ended. (Steps in <span data-x="synchronous
-       section">synchronous sections</span> are marked with &#x231B;.)</p></li>
+       <li><p><span>Await a stable state</span> given <var>asyncContext</var>.
+       The <span>synchronous section</span> consists of all the remaining steps of this algorithm
+       until the algorithm says the <span>synchronous section</span> has ended.
+       (Steps in <span data-x="synchronous section">synchronous sections</span> are marked with
+       &#x231B;.)</p></li>
+
+       <li>
+        <p>&#x231B; Let <var>asyncContext</var> be AsyncContextSnapshot().</p>
+
+        <p class="note">This is the same one as in the previous step, but we obtain it again from
+        the environment to clarify we're not relying on capturing the outer variable into the
+        <span>synchronous section</span>.</p>
+       </li>
 
        <li><p>&#x231B; <span>Forget the media element's media-resource-specific
        tracks</span>.</p></li>
@@ -36722,6 +36743,7 @@ interface <dfn interface>MediaError</dfn> {
        <li><p>&#x231B; Set the element's <span>show poster flag</span> to true.</p></li>
 
        <li><p>&#x231B; <span>Queue a media element task</span> given the <span>media element</span>
+       and <var>asyncContext</var>
        to set the element's <span>delaying-the-load-event flag</span> to false. This stops <span
        data-x="delay the load event">delaying the load event</span>.</p></li>
 
@@ -36731,10 +36753,19 @@ interface <dfn interface>MediaError</dfn> {
        <li><p>Wait until the node after <var>pointer</var> is a node other than the end of
        the list. (This step might wait forever.)</p></li>
 
-       <li><p><span>Await a stable state</span>. The <span>synchronous section</span>
-       consists of all the remaining steps of this algorithm until the algorithm says the
-       <span>synchronous section</span> has ended. (Steps in <span data-x="synchronous
-       section">synchronous sections</span> are marked with &#x231B;.)</p></li>
+       <li><p><span>Await a stable state</span> given <var>asyncContext</var>.
+       The <span>synchronous section</span> consists of all the remaining steps of this algorithm
+       until the algorithm says the <span>synchronous section</span> has ended.
+       (Steps in <span data-x="synchronous section">synchronous sections</span> are marked with
+       &#x231B;.)</p></li>
+
+       <li>
+        <p>&#x231B; Let <var>asyncContext</var> be AsyncContextSnapshot().</p>
+
+        <p class="note">This is the same one as in the previous step, but we obtain it again from
+        the environment to clarify we're not relying on capturing the outer variable into the
+        <span>synchronous section</span>.</p>
+       </li>
 
        <li><p>&#x231B; Set the element's <span>delaying-the-load-event flag</span> back to true (this
        <span data-x="delay the load event">delays the load event</span> again, in case it hasn't been
@@ -36846,9 +36877,11 @@ interface <dfn interface>MediaError</dfn> {
 
   <p>The <dfn data-x="concept-media-load-resource" export>resource fetch algorithm</dfn> for a
   <span>media element</span> and a given <span>URL record</span> or <span>media provider
-  object</span> is as follows:</p>
+  object</span> and an Async Context <var>asyncContext</var> is as follows:</p>
 
   <ol>
+   <li><p class="XXX">Everything below must use <var>asyncContext</var>.</p></li>
+
    <li><p>Let <var>mode</var> be <i>remote</i>.</p></li>
 
    <li>
@@ -113119,6 +113152,7 @@ import "https://example.com/foo/../module2.mjs";</code></pre>
   </ol>
 
   <p>To <dfn export>queue a microtask</dfn> which performs a series of steps <var>steps</var>,
+  with an AsyncContext <var>asyncContext</var> and
   optionally given a document <var>document</var>:</p>
 
   <ol>
@@ -113144,6 +113178,9 @@ import "https://example.com/foo/../module2.mjs";</code></pre>
 
    <li><p>Set <var>microtask</var>'s <span>script evaluation environment settings object set</span>
    to an empty <span>set</span>.</p></li>
+
+   <li><p>Set <var>microtask</var>'s <span data-x="concept-task-async-context">async context</span>
+   to <var>asyncContext</var>.</p></li>
 
    <li><p><span>Enqueue</span> <var>microtask</var> on <var>eventLoop</var>'s <span>microtask
    queue</span>.</p></li>
@@ -113769,10 +113806,10 @@ import "https://example.com/foo/../module2.mjs";</code></pre>
 
   <hr>
 
-  <p>When an algorithm running <span>in parallel</span> is to <dfn>await a stable state</dfn>, the
-  user agent must <span>queue a microtask</span> that runs the following steps, and must then stop
-  executing (execution of the algorithm resumes when the microtask is run, as described in the
-  following steps):</p>
+  <p>When an algorithm running <span>in parallel</span> is to <dfn>await a stable state</dfn> given
+  an AsyncContext <var>asyncContext</var>, the user agent must <span>queue a microtask</span> given
+  <var>asyncContext</var> that runs the following steps, and must then stop executing (execution of
+  the algorithm resumes when the microtask is run, as described in the following steps):</p>
 
   <ol>
    <li><p>Run the algorithm's <dfn>synchronous section</dfn>.</p></li>
