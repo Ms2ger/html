@@ -37029,7 +37029,7 @@ interface <dfn interface>MediaError</dfn> {
          <span>unsafe response</span> obtained in this fashion. <var>response</var> can be
          <span>CORS-same-origin</span> or <span>CORS-cross-origin</span>; this affects whether
          subtitles referenced in the <span>media data</span> are exposed in the API and, for
-         <code>video</code> elements, whether a<code>canvas</code> gets tainted when the video is
+         <code>video</code> elements, whether a <code>canvas</code> gets tainted when the video is
          drawn on it.</p></li>
         </ol>
 
