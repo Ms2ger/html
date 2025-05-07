@@ -36931,11 +36931,13 @@ interface <dfn interface>MediaError</dfn> {
          <li><p>Set the <code data-x="dom-media-networkState">networkState</code> to <code
          data-x="dom-media-NETWORK_IDLE">NETWORK_IDLE</code>.</p></li>
 
-         <li><p><span>Queue a media element task</span> given the <span>media element</span> to
+         <li><p><span>Queue a media element task</span> given the <span>media element</span> and
+         <var>asyncContext</var> to
          <span data-x="concept-event-fire">fire an event</span> named <code
          data-x="event-media-suspend">suspend</code> at the element.</p></li>
 
-         <li><p><span>Queue a media element task</span> given the <span>media element</span> to set
+         <li><p><span>Queue a media element task</span> given the <span>media element</span> and
+         <var>asyncContext</var> to set
          the element's <span>delaying-the-load-event flag</span> to false. This stops <span
          data-x="delay the load event">delaying the load event</span>.</p></li>
 
@@ -36994,16 +36996,26 @@ interface <dfn interface>MediaError</dfn> {
        </li>
 
        <li>
-        <!--FETCH--><p><span data-x="concept-fetch">Fetch</span> <var>request</var>, with
+        <!--FETCH--><p><span data-x="concept-fetch">Fetch</span> <var>request</var> given
+        <var>asyncContext</var>, with
         <i data-x="processResponse">processResponse</i> set to the following steps given
         <span data-x="concept-response">response</span> <var>response</var>:</p>
 
         <ol>
+         <li>
+          <p>Let <var>asyncContext</var> be AsyncContextSnapshot().</p>
+
+          <p class="note">This is the same one used to start the fecth, but we obtain it again from
+          the environment to clarify we're not relying on capturing the outer variable into this
+          callback.</p>
+         </li>
+
          <li><p>Let <var>global</var> be the <span>media element</span>'s
          <span>node document</span>'s <span>relevant global object</span>.</p></li>
 
          <li><p>Let <var>updateMedia</var> be to <span>queue a media element task</span> given
-         the <span>media element</span> to run the first appropriate steps from the
+         the <span>media element</span> and <var>asyncContext</var> to run the first appropriate
+         steps from the
          <span>media data processing steps list</span> below. (A new task is used for
          this so that the work described below occurs relative to the appropriate
          <span>media element event task source</span> rather than using the
@@ -37022,8 +37034,8 @@ interface <dfn interface>MediaError</dfn> {
 
          <li><p>Otherwise, <span data-x="body-incrementally-read">incrementally read</span>
          <var>response</var>'s <span data-x="concept-response-body">body</span> given
-         <var>updateMedia</var>, <var>processEndOfMedia</var>, an empty algorithm, and
-         <var>global</var>.</p></li>
+         <var>updateMedia</var>, <var>processEndOfMedia</var>, an empty algorithm,
+         <var>asyncContext</var>, and <var>global</var>.</p></li>
 
          <li><p>Update the <span>media data</span> with the contents of <var>response</var>'s
          <span>unsafe response</span> obtained in this fashion. <var>response</var> can be
@@ -37038,7 +37050,8 @@ interface <dfn interface>MediaError</dfn> {
         When a <span>media element</span> that is actively attempting to obtain <span>media
         data</span> has failed to receive any data for a duration equal to the <span>media element
         stall timeout</span>, the user agent must <span>queue a media element task</span> given the
-        <span>media element</span> to:</p>
+        <span>media element</span> and <var>asyncContext</var> <span class=XXX>(or an empty
+        context?)</span> to:</p>
 
         <ol>
          <li><p><span data-x="concept-event-fire">Fire an event</span> named <code
@@ -37058,13 +37071,15 @@ interface <dfn interface>MediaError</dfn> {
         to decide whether to play the resource or not, while waiting for user input in an
         interactive resource, or when the user navigates away from the page. When a <span>media
         element</span>'s download has been suspended, the user agent must <span>queue a media
-        element task</span> given the <span>media element</span> to set the <code
+        element task</span> given the <span>media element</span> and <var>asyncContext</var>
+        <span class=XXX>(or an empty context?)</span> to set the <code
         data-x="dom-media-networkState">networkState</code> to <code
         data-x="dom-media-NETWORK_IDLE">NETWORK_IDLE</code> and <span
         data-x="concept-event-fire">fire an event</span> named <code
         data-x="event-media-suspend">suspend</code> at the element. If and when downloading of the
         resource resumes, the user agent must <span>queue a media element task</span> given the
-        <span>media element</span> to set the <code
+        <span>media element</span> and <var>asyncContext</var>
+        <span class=XXX>(or an empty context?)</span> to set the <code
         data-x="dom-media-networkState">networkState</code> to <code
         data-x="dom-media-NETWORK_LOADING">NETWORK_LOADING</code>. Between the queuing of these
         tasks, the load is suspended (so <code data-x="event-media-progress">progress</code> events
@@ -37076,7 +37091,8 @@ interface <dfn interface>MediaError</dfn> {
 
         <p>When a user agent decides to completely suspend a download, e.g., if it is waiting until
         the user starts playback before downloading any further content, the user agent must
-        <span>queue a media element task</span> given the <span>media element</span> to set the
+        <span>queue a media element task</span> given the <span>media element</span>
+        (async context is irrelevant) to set the
         element's <span>delaying-the-load-event flag</span> to false. This stops <span data-x="delay
         the load event">delaying the load event</span>.</p>
 
@@ -37091,7 +37107,8 @@ interface <dfn interface>MediaError</dfn> {
 
         <p>While the load is not suspended (see below), every 350ms (&#xB1;200ms) or for every byte
         received, whichever is <em>least</em> frequent, <span>queue a media element task</span>
-        given the <span>media element</span> to:
+        given the <span>media element</span> and <var>asyncContext</var>
+        <span class=XXX>(or an empty context?)</span> to:
 
         <ol>
          <li><p><span data-x="concept-event-fire">Fire an event</span> named <code
@@ -37116,6 +37133,7 @@ interface <dfn interface>MediaError</dfn> {
      <dt>Otherwise (<var>mode</var> is <i>local</i>)</dt>
 
      <dd>
+      <!-- HERE -->
       <p>The resource described by the <var>current media resource</var>, if any, contains the
       <span>media data</span>. It is <span>CORS-same-origin</span>. </p>
 
