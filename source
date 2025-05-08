@@ -37133,7 +37133,6 @@ interface <dfn interface>MediaError</dfn> {
      <dt>Otherwise (<var>mode</var> is <i>local</i>)</dt>
 
      <dd>
-      <!-- HERE -->
       <p>The resource described by the <var>current media resource</var>, if any, contains the
       <span>media data</span>. It is <span>CORS-same-origin</span>. </p>
 
@@ -37144,7 +37143,8 @@ interface <dfn interface>MediaError</dfn> {
       format is the format given by the relevant specification.</p>
 
       <p>Whenever new data for the <var>current media resource</var> becomes available, <span>queue
-      a media element task</span> given the <span>media element</span> to run the first appropriate
+      a media element task</span> given the <span>media element</span> and <var>asyncContext</var>
+      <span class=XXX>(or an empty context?)</span> to run the first appropriate
       steps from the <span>media data processing steps list</span> below.</p>
 
       <p>When the <var>current media resource</var> is permanently exhausted (e.g. all the bytes of
