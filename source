@@ -37050,8 +37050,8 @@ interface <dfn interface>MediaError</dfn> {
         When a <span>media element</span> that is actively attempting to obtain <span>media
         data</span> has failed to receive any data for a duration equal to the <span>media element
         stall timeout</span>, the user agent must <span>queue a media element task</span> given the
-        <span>media element</span> and <var>asyncContext</var> <span class=XXX>(or an empty
-        context?)</span> to:</p>
+        <span>media element</span> and <var>asyncContext</var> <span data-x="" class=XXX>(or an
+        empty context?)</span> to:</p>
 
         <ol>
          <li><p><span data-x="concept-event-fire">Fire an event</span> named <code
@@ -37072,14 +37072,14 @@ interface <dfn interface>MediaError</dfn> {
         interactive resource, or when the user navigates away from the page. When a <span>media
         element</span>'s download has been suspended, the user agent must <span>queue a media
         element task</span> given the <span>media element</span> and <var>asyncContext</var>
-        <span class=XXX>(or an empty context?)</span> to set the <code
+        <span data-x="" class=XXX>(or an empty context?)</span> to set the <code
         data-x="dom-media-networkState">networkState</code> to <code
         data-x="dom-media-NETWORK_IDLE">NETWORK_IDLE</code> and <span
         data-x="concept-event-fire">fire an event</span> named <code
         data-x="event-media-suspend">suspend</code> at the element. If and when downloading of the
         resource resumes, the user agent must <span>queue a media element task</span> given the
         <span>media element</span> and <var>asyncContext</var>
-        <span class=XXX>(or an empty context?)</span> to set the <code
+        <span data-x="" class=XXX>(or an empty context?)</span> to set the <code
         data-x="dom-media-networkState">networkState</code> to <code
         data-x="dom-media-NETWORK_LOADING">NETWORK_LOADING</code>. Between the queuing of these
         tasks, the load is suspended (so <code data-x="event-media-progress">progress</code> events
@@ -37108,7 +37108,7 @@ interface <dfn interface>MediaError</dfn> {
         <p>While the load is not suspended (see below), every 350ms (&#xB1;200ms) or for every byte
         received, whichever is <em>least</em> frequent, <span>queue a media element task</span>
         given the <span>media element</span> and <var>asyncContext</var>
-        <span class=XXX>(or an empty context?)</span> to:
+        <span data-x="" class=XXX>(or an empty context?)</span> to:
 
         <ol>
          <li><p><span data-x="concept-event-fire">Fire an event</span> named <code
@@ -37144,7 +37144,7 @@ interface <dfn interface>MediaError</dfn> {
 
       <p>Whenever new data for the <var>current media resource</var> becomes available, <span>queue
       a media element task</span> given the <span>media element</span> and <var>asyncContext</var>
-      <span class=XXX>(or an empty context?)</span> to run the first appropriate
+      <span data-x="" class=XXX>(or an empty context?)</span> to run the first appropriate
       steps from the <span>media data processing steps list</span> below.</p>
 
       <p>When the <var>current media resource</var> is permanently exhausted (e.g. all the bytes of
